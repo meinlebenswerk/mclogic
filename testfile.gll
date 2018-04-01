@@ -1,0 +1,11 @@
+wire a, b, c, d;
+
+assign c = (a&b)^d;
+
+//adder::
+wire x, y, cin, cout, s;
+wire t1;
+
+assign cout = (x&y) | t1;
+assign t1 = (x^y) & cin;
+assign s  = cin ^ (x^y);

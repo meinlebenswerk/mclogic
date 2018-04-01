@@ -1,0 +1,21 @@
+//Format: Internal ID, MC_ID, MC_META, name;
+0,24,0,sandstone;
+1,55,0,rs_wire;
+
+2,76,1,rs_torch_west;
+3,76,2,rs_torch_east;
+4,76,3,rs_torch_north;
+5,76,4,rs_torch_south;
+6,76,5,rs_torch_floor;
+
+07,149,3,rs_comp_west;
+08,149,1,rs_comp_east;
+09,149,0,rs_comp_north;
+10,149,2,rs_comp_south;
+
+11,149,7,rs_sub_west;
+12,149,5,rs_sub_east;
+13,149,4,rs_sub_north;
+14,149,6,rs_sub_south;
+
+15,0,0,air;

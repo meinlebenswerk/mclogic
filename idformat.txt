@@ -1,0 +1,34 @@
+MC BLOCK        ::  MC_ID       :: INTERNAL ID  :: has_meta?
+Sandstone           24             0               true -> 0 for normal
+redstone_wire       55             1               true -> signalstrength (leave to MC)
+
+redstone_torch      76             2               true -> 1 (west)
+redstone_torch      76             3               true -> 2 (east)
+redstone_torch      76             4               true -> 3 (north)
+redstone_torch      76             5               true -> 4 (south)
+redstone_torch      76             6               true -> 5 (floor)
+
+
+redstone_comparator 149            7               true (2)     <- configured normally
+redstone_comparator 149            8               true (2)     <- as subtractor
+
+
+(1)::
+Wert	Beschreibung
+1	an einer Westwand hängend
+2	an einer Ostwand hängend
+3	an einer Nordwand hängend
+4	an einer Südwand hängend
+5	auf dem Boden stehend
+
+
+Wert	Beschreibung
+149 unpowered_comparator
+0	nach Norden
+1	nach Osten
+2	nach Süden
+3	nach Westen
++0	off
++4	Subtractor
++8	activated
++12	activated Subtractor

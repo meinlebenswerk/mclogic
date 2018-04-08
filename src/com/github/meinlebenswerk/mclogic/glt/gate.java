@@ -12,11 +12,15 @@ public class gate {
     private int[] output;
     private gate_type type;
 
+    private int level;
+
     public gate(int[] input, int output, gate_type type){
         this.output    = new int[1];
         this.output[0] = output;
         this.input     = Arrays.copyOf(input,input.length);
         this.type      = type;
+
+        this.level     = 0;
     }
 
     public gate(int[] input, int[] output, gate_type type){
@@ -41,4 +45,10 @@ public class gate {
     public String makeReadable(){
         return String.format("%s inputs%s output%s", type.name(), Arrays.toString(input), Arrays.toString(output));
     }
+
+
+    public void incrementLevel(){level++;}
+    public void decrementLevel(){level--;}
+    public int getLevel(){return level;}
+    public void setLevel(int level){this.level = level;}
 }

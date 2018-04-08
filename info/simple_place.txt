@@ -1,0 +1,2 @@
+This place-method works by basically splitting the design into layers based on gate-dependence (how many gates does one gate depend on).
+These layers then are just placed one after the other, simple as that. This method probably is not very space-efficient but it's easy to understand and work with, so for getting this project to work, it's a good starting point.

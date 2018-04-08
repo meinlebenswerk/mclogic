@@ -5,9 +5,9 @@ public class net {
     //A wire basically is the same as a net;
     //each net has a driver and an id (which is an INT);
 
-    String codename;
-    int id;
-    int level;
+    private String codename;
+    private int id;
+    private int level;
 
     public net(String codename, int id){
         this.codename = codename;
@@ -31,4 +31,5 @@ public class net {
     public void incrementLevel(){level++;}
     public void decrementLevel(){level--;}
     public int getLevel(){return level;}
+    public void setLevel(int level){this.level = level;}
 }

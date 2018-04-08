@@ -29,7 +29,7 @@ public class gllparser {
         ice ce =  parser.readTokenList(tokenList);
 
         optimizer opt = new optimizer(ce);
-        opt.optimizeGates();
+        //opt.optimizeGates();
 
         return ce;
     }

@@ -6,16 +6,23 @@ import com.github.meinlebenswerk.mclogic.glt.gate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class translator {
     //this class just handles to structuredef to mc-blocks conversion
-    String fname;
+    private String fname;
+    private List<structure> struts;
+
+    private int padding_z = 1;
+    private int padding_x = 5;
+
+    private int base_y = 20;
 
     public translator(String fname){
-        this.fname = fname;
+        this.fname  = fname;
+        this.struts = new ArrayList<>();
     }
 
     public void init(){
@@ -35,56 +42,83 @@ public class translator {
                 //System.out.println(s);
                 s.replaceAll(";","");
                 String[] data = s.split(",");
-                System.out.println(Arrays.toString(data));
                 structure strut = new structure(data[0],data[1],Integer.parseInt(data[2]),data[3],data[4]);
+                System.out.println(strut.makeReadable());
+                struts.add(strut);
             }
+        }
+
+        System.out.println("Loaded Gates in HLT-Table ::");
+        for(structure s : struts){
+            System.out.println(s.getName());
         }
     }
 
     public void placeGates(List<gate> gatelist, int[][] layers){
-        //first get the width of the widest gate -> that determines scaling.
-        //then just via translator align them.
-    }
-
-}
+        //layers is a 2d array of gatelist-ids (basically can be regarded as pointers.) layers[layer][gate] = gateID
+        //TODO: instead of saving the pointer -> save a rep of the gate that we're talking about
 
 
-
-class structure{
-    int[][][] data;
-    int[][] iomap;
-    String name;
-    int delay;
-
-    int sx,sy,sz;
-
-    structure(String name,String size,int delay, String din, String io){
-        this.name  = name;
-        this.delay = delay;
-
-        //parse size;
-        String[] tmp = size.split("x");
-        sx = Integer.parseInt(tmp[0]);
-        sy = Integer.parseInt(tmp[1]);
-        sz = Integer.parseInt(tmp[2]);
-
-        data = new int[sx][sy][sz];
-
-        //parse data
-        tmp = din.replaceAll(" ","").split(".");
-        for(int i=0;i<tmp.length;i++){
-            String[] tt = tmp[i].replaceAll("(|)","").split(":");
-            int y = (int) Math.floor(i/sz);
-            int z = i%sz;
-            for(int ii=0;ii<sx;ii++){
-                int x = ii;
-                data[x][y][z] = Integer.parseInt(tt[ii]);
+        //first get the length of the longest gate -> that determines scaling for that layer.
+        //basically looks like this:
+        // gate gate gate ^ next layer -> more gates ^length -> width [^x ->z]
+        int[] layersize = new int[layers.length];
+        for(int i=0;i<layers.length;i++){
+            layersize[i] = 0;
+            for(int ii=0;ii<layers[i].length;ii++){
+                structure tmp_s = lookUpGateStructure(gatelist.get(layers[i][ii]));
+                if(tmp_s.getSX() > layersize[i]){
+                    layersize[i] = tmp_s.getSX();
+                }
             }
-            System.out.println(Arrays.toString(data[0][0]));
         }
+
+        //then just via translator align them.
+        int cx = 0;
+        int index = 0;
+        structure[] structures = new structure[gatelist.size()];
+        for(int i=0;i<layers.length;i++){
+            structure[] tmp_struts = alignLayerSimple(cx,base_y,0, gatelist, layers[i]);
+            cx += layersize[i] + padding_x;
+
+            System.arraycopy(tmp_struts, 0, structures, index, layers[i].length);
+            index += layers[i].length;
+        }
+
+        //now all the gates exists as structures in the "structures" list -> TODO: use structure_instances to save memory :)
+
+        //This concludes the place part
+
+        System.out.println("place_done");
     }
 
-    String makeReadable(){
-        return String.format("Structure %s, size:[%d][%d][%d], delay:[]", name, sx,sy,sz, delay);
+    private structure[] alignLayerSimple(int start_x, int start_y, int start_z, List<gate> gatelist, int[] layer_data){
+        //this functions places one layer with the "simple"-place algorithm
+
+        int cposx, cposy, cposz;
+        cposx = start_x;
+        cposy = start_y;
+        cposz = start_z;
+        structure[] layer_strut = new structure[layer_data.length];
+
+        for(int i=0;i<layer_data.length;i++){
+            layer_strut[i] = lookUpGateStructure(gatelist.get(layer_data[i]));
+            layer_strut[i].setPosition(cposx,cposy,cposz);
+
+            cposz += padding_z + layer_strut[i].getSZ();
+        }
+
+        return layer_strut;
     }
+
+    private structure lookUpGateStructure(gate g){
+        //TODO search in struts
+        for(structure s : struts){
+            if(s.getName().equalsIgnoreCase(g.getType().name())){
+                return s;
+            }
+        }
+        return null;
+    }
+
 }

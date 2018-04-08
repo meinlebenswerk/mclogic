@@ -10,7 +10,7 @@ import java.util.List;
 
 public class parman {
     //the place and route manager
-    translator tl;
+    private translator tl;
 
     public parman(translator tl){
         this.tl = tl;
@@ -60,28 +60,54 @@ public class parman {
         debugPringNL(netlist);
 
         //STEP 2
-        //then group the gates into layers, depending on level (here gate-ids are used)
+        //then group the nets into layers, depending on level (here net-ids are used)
         int[] cnt = new int[highest_level+1];
-        int[][] layers = new int[highest_level+1][];
+        int[][] net_layers = new int[highest_level+1][];
         for (int i = 0; i <= highest_level; i++) {
             for (int j = 0; j < netlist.size(); j++) {
                 if(netlist.get(j).getLevel() == i){
                     cnt[i]++;
                 }
             }
-            layers[i] = new int[cnt[i]];
+            net_layers[i] = new int[cnt[i]];
             int index = 0;
             for (int j = 0; j < netlist.size(); j++) {
                 if(netlist.get(j).getLevel() == i){
-                    layers[i][index] = j;
+                    net_layers[i][index] = j;
                     index++;
                 }
             }
         }
+        //as well as the gates::
+        int[] tmp = new int[highest_level+1];
+        int[][] gate_layers = new int[highest_level+1][];
+        //first determine levels; tmp contains the occurrences of the levels
+        for(gate g : gatelist){
+            //gate level is determined by highest input-level
+            int lvl = 0;
+            for(int in : g.getInput()){
+                if(netlist.get(in).getLevel() > lvl){
+                    lvl = netlist.get(in).getLevel();
+                }
+            }
+            g.setLevel(lvl);
+            tmp[lvl] += 1;
+        }
+        for(int i=0;i<tmp.length;i++){
+            gate_layers[i] = new int[tmp[i]];
+        }
+
+        //then sort the gates accordingly; tmp is now the level_index_counter
+        tmp = new int[highest_level+1];
+        for(gate g : gatelist){
+            gate_layers[g.getLevel()][tmp[g.getLevel()]] = gatelist.indexOf(g);
+            tmp[g.getLevel()] ++;
+        }
+
 
         //STEP 3
         //then physically place the gates as described in the net
-        tl.placeGates(gatelist,layers);
+        tl.placeGates(gatelist,gate_layers);
 
 
         //STEP 4 route !
